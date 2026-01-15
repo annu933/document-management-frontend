@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import { useAuth } from "./context/AuthContext";
 import Upload from "./pages/Upload";
+import DocumentList from "./pages/DocumentTable";
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/list" element={<DocumentList />} />
     </Routes>
   );
 }
