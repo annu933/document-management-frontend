@@ -1,7 +1,7 @@
-import { Autocomplete, Box, Button, Container, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Chip, Container, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/api";
 
 const PERSONAL = ["John", "Tom", "Emily"];
@@ -11,7 +11,7 @@ export default function Upload() {
     const [documentDate, setDocumentDate] = useState(dayjs())
     const [majorHead, setMajorHead] = useState("")
     const [minorHead, setMinorHead] = useState("")
-    const [tags, setTags] = useState("")
+    const [tags, setTags] = useState([])
     const [remarks, setRemarks] = useState("")
     const [file, setFile] = useState(null);
     const [availableTags, setAvailableTags] = useState([]);
@@ -19,26 +19,33 @@ export default function Upload() {
         majorHead === "Personal" ? PERSONAL :
             majorHead === "Professional" ? PROFESSIONAL : [];
 
+    // fetch existing tags
+    useEffect(() => {
+        api.post("/documentTags", { term: "" })
+            .then((res) => setAvailableTags(res.data?.data || []))
+            .catch(() => { });
+    }, []);
+    console.log("setAvailableTags", availableTags)
+
     const handleFileChange = (e) => {
         const selected = e.target.files[0];
         if (!selected) return;
-        const allowed = ["application/pdf", "image/png", "image/jpg"]
+        const allowed = ["application/pdf", "image/png", "image/jpeg"]
         if (!allowed.includes(selected.type)) {
             alert("Only PDF and Image files are allowed");
         }
         setFile(selected);
     }
-    const handleSubmit = async (values) => {
-        console.log("handleSubmit", values)
+    const handleSubmit = async () => {
         if (!file || !majorHead || !minorHead) {
             alert("Please required field");
             return
         }
-        const normalizedTags = Array.isArray(tags)
-            ? tags.map((t) =>
-                typeof t === "string" ? t : t.tag_name
-            )
-            : [];
+        const normalizedTags = tags
+            .map((t) => t.label)
+            .filter(Boolean);
+
+        console.log("tags", tags)
         const formattedDate = documentDate
             ? dayjs(documentDate).format("DD-MM-YYYY")
             : "";
@@ -50,14 +57,14 @@ export default function Upload() {
             tags: normalizedTags.map((t) => ({ tag_name: t })),
             user_id: "annu",
         }
-
-        const formData = new FormData;
+        console.log("normalizedTags", normalizedTags)
+        const formData = new FormData();
         formData.append("file", file);
         formData.append("data", JSON.stringify(payload))
 
 
         try {
-            const res = api.post("/saveDocumentEntry", formData);
+            const res = await api.post("/saveDocumentEntry", formData);
             alert("Document update successfully")
         } catch (err) {
             console.log(err)
@@ -106,13 +113,23 @@ export default function Upload() {
 
                     <Autocomplete
                         multiple
-                        freeSolo
-                        options={availableTags.map((t) => t.tag_name || t)}
+                        // freeSolo
+                        options={availableTags}
                         value={tags}
-                        onChange={(e, newValue) => setTags(newValue)}
+                        getOptionLabel={(option) =>
+                            typeof option === "string" ? option : option.label || ""
+                        }
+                        onChange={(e, newValue) => {
+                            const normalized = newValue.map((item) =>
+                                typeof item === "string"
+                                    ? { label: item }
+                                    : item
+                            );
+                            setTags(normalized)
+                        }}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
-                                <Chip label={option} {...getTagProps({ index })} />
+                                <Chip label={option.label} {...getTagProps({ index })} />
                             ))
                         }
                         renderInput={(params) => (
