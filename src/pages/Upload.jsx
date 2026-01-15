@@ -39,10 +39,13 @@ export default function Upload() {
                 typeof t === "string" ? t : t.tag_name
             )
             : [];
+        const formattedDate = documentDate
+            ? dayjs(documentDate).format("DD-MM-YYYY")
+            : "";
         const payload = {
             major_head: majorHead,
             minor_head: minorHead,
-            document_date: documentDate,
+            document_date: formattedDate,
             document_remarks: remarks,
             tags: normalizedTags.map((t) => ({ tag_name: t })),
             user_id: "annu",
