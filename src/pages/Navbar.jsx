@@ -19,11 +19,13 @@ export default function Navbar() {
                 </Typography>
 
                 {/* Right */}
-                {isLogin === "null" && (
-                    <Button color="inherit" onClick={handleLogout}>
-                        Logout
-                    </Button>
-                )}
+                {isLogin === "null" ?
+                    "" :
+                    (
+                        <Button color="inherit" onClick={handleLogout}>
+                            Logout
+                        </Button>
+                    )}
 
             </Toolbar>
         </AppBar>
