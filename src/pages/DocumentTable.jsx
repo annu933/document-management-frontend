@@ -4,12 +4,18 @@ import { useEffect, useState } from "react";
 import api from "../api/api";
 import dayjs from "dayjs";
 import mockDocuments from "../document.json"
+import PreviewModal from "../components/PreviewModal";
+import FilterModal from "../components/FilterModal";
+import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent } from "@mui/material";
+import Upload from "./Upload";
 
 
 const PERSONAL = ["John", "Tom", "Emily"];
 const PROFESSIONAL = ["Accounts", "HR", "IT", "Finance"];
 
 export default function DocumentList() {
+    const navigate = useNavigate();
     const [majorHead, setMajorHead] = useState("");
     const [minorHead, setMinorHead] = useState("");
     const [fromDate, setFromDate] = useState(null);
@@ -17,6 +23,10 @@ export default function DocumentList() {
     const [tags, setTags] = useState([]);
     const [availableTags, setAvailableTags] = useState([]);
     const [results, setResults] = useState([]);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState("");
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [uploadOpen, setUploadOpen] = useState(false);
 
 
     const minorOptions =
@@ -72,12 +82,107 @@ export default function DocumentList() {
     };
     return (
         <Container maxWidth="lg">
-            <Box>
-                <Typography variant="h5" mb={3}>
-                    Search Documents
-                </Typography>
+            <Box p={5}>
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={2}
+                >
+                    {/* Left */}
+                    <Typography variant="h6">
+                        All Documents
+                    </Typography>
 
-                <Stack spacing={2} mb={3}>
+                    {/* Right */}
+                    <Box display="flex" gap={2}>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setUploadOpen(true)}
+                        >
+                            Upload Docs
+                        </Button>
+                        <Button variant="contained"
+                            onClick={() => setFilterOpen(true)}
+                        >
+                            Filter
+                        </Button>
+                    </Box>
+                </Box>
+
+                {/* table */}
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Id</TableCell>
+                            <TableCell>Document</TableCell>
+                            <TableCell>Category</TableCell>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Action</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {results.map((row, idx) => (
+                            <TableRow key={idx}>
+                                <TableCell>{row.document_id || "Document"}</TableCell>
+                                <TableCell>{row.file_name || "Document"}</TableCell>
+                                <TableCell>{row.major_head}</TableCell>
+                                <TableCell>{row.document_date}</TableCell>
+                                <TableCell>
+                                    <Button
+                                        size="small"
+                                        onClick={() => {
+                                            setPreviewUrl(row.file_url);
+                                            setPreviewOpen(true);
+                                        }}
+                                    >
+                                        Preview
+                                    </Button>
+
+                                    <Button
+                                        size="small"
+                                        component="a"
+                                        href={row.file_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Download
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        {results.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={3} align="center">
+                                    No records found
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                <PreviewModal
+                    open={previewOpen}
+                    onClose={() => setPreviewOpen(false)}
+                    fileUrl={previewUrl}
+                />
+
+                {/* filter modal */}
+                <FilterModal
+                    open={filterOpen}
+                    onClose={() => setFilterOpen(false)}
+                    onApply={() => {
+                        handleSearch();
+                        setFilterOpen(false);
+                    }}
+                    onReset={() => {
+                        setMajorHead("");
+                        setMinorHead("");
+                        setFromDate(null);
+                        setToDate(null);
+                        setTags([]);
+                    }}
+                >
+
                     <Stack direction="row" spacing={2}>
                         <TextField
                             select
@@ -113,15 +218,14 @@ export default function DocumentList() {
                         <DatePicker
                             label="From Date"
                             value={fromDate}
-                            onChange={(newValue) => setFromDate(newValue)}
+                            onChange={setFromDate}
                         />
                         <DatePicker
                             label="To Date"
                             value={toDate}
-                            onChange={(newValue) => setToDate(newValue)}
+                            onChange={setToDate}
                         />
                     </Stack>
-
                     <Autocomplete
                         multiple
                         freeSolo
@@ -145,37 +249,20 @@ export default function DocumentList() {
                             <TextField {...params} label="Tags" />
                         )}
                     />
+                </FilterModal>
 
-                    <Button variant="contained" onClick={handleSearch}>
-                        Search
-                    </Button>
-                </Stack>
-                {/* table */}
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Document</TableCell>
-                            <TableCell>Category</TableCell>
-                            <TableCell>Date</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {results.map((row, idx) => (
-                            <TableRow key={idx}>
-                                <TableCell>{row.file_name || "Document"}</TableCell>
-                                <TableCell>{row.major_head}</TableCell>
-                                <TableCell>{row.document_date}</TableCell>
-                            </TableRow>
-                        ))}
-                        {results.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={3} align="center">
-                                    No records found
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                {/* modal for upload file */}
+                <Dialog
+                    open={uploadOpen}
+                    onClose={() => setUploadOpen(false)}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <DialogContent>
+                        <Upload />
+                    </DialogContent>
+                </Dialog>
+
             </Box>
         </Container>
     )
