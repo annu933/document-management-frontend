@@ -3,6 +3,9 @@ import Login from "./pages/Login";
 import { useAuth } from "./context/AuthContext";
 import Upload from "./pages/Upload";
 import DocumentList from "./pages/DocumentTable";
+import AdminUser from "./pages/RegisterUser";
+import Navbar from "./pages/Navbar";
+import LaunchPage from "./pages/LaunchPage";
 
 function App() {
 
@@ -12,19 +15,22 @@ function App() {
     return token ? children : <Navigate to="/login" replace />
   }
   return (
-    <Routes>
-      <Route path="/" element={<div>App Initialized</div>} />
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/upload"
-        element={
-          <ProtectedRoute>
-            <Upload />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/list" element={<DocumentList />} />
-    </Routes>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<LaunchPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/list"
+          element={
+            <ProtectedRoute>
+              <DocumentList />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/register" element={<AdminUser />} />
+      </Routes>
+    </>
+
   );
 }
 

@@ -39,7 +39,7 @@ export default function Login() {
             })
             console.log("res token", res)
             login(res.data.data.token);
-            navigate("/upload")
+            navigate("/list")
         } catch (err) {
             console.log(err)
             alert("Failed to validate otp")
