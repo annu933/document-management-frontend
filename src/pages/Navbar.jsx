@@ -19,7 +19,7 @@ export default function Navbar() {
                 </Typography>
 
                 {/* Right */}
-                {isLogin === "null" ?
+                {isLogin == null ?
                     "" :
                     (
                         <Button color="inherit" onClick={handleLogout}>
