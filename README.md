@@ -1,16 +1,81 @@
-# React + Vite
+# Document Management System – Frontend Assignment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## ✨ Features Implemented
 
-Currently, two official plugins are available:
+### 1️⃣ Launch Page
+- Entry page with **Login** and **Register** actions
+- Simple and clean UI
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 2️⃣ OTP-based Login
+- Generate OTP using mobile number
+- Validate OTP
+- Token stored in `localStorage`
+- Protected routes after login
 
-## React Compiler
+### 3️⃣ Static Admin User Creation Page
+- UI-only implementation (as backend API not provided)
+- Fields: Username, Password, Role
+- Displays success message on submission
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+### 4️⃣ Document Listing
+- Displays documents in a tabular format
+- Columns: Document ID, Category, Date, Actions
+- Data fetched from Search Document API
 
-## Expanding the ESLint configuration
+### 5️⃣ Upload Document
+- Upload document using modal
+- Fields:
+  - Document Date
+  - Category
+  - Sub Category
+  - Tags
+  - Remarks
+  - File upload (PDF / Image)
+- Integrated with backend upload API
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 6️⃣ Filter Documents
+- Filter modal with:
+  - Category
+  - Sub Category
+  - Date Range
+  - Tags
+- Applies filters using Search API
+
+### 7️⃣ Preview & Download
+- Preview:
+  - Images shown inside modal
+  - PDFs opened via iframe (depends on signed URL permissions)
+- Download:
+  - Redirects to signed S3 URL
+
+### 8️⃣ Navigation Bar
+- App title
+- Logout button
+- Visible on authenticated pages
+
+---
+
+## 🛠 Tech Stack
+
+- **React (Vite + SWC)**
+- **Material UI (MUI)**
+- **React Router DOM**
+- **Axios**
+- **Day.js**
+- **MUI X Date Pickers**
+
+---
+
+## ▶️ How to Run the Project
+
+### Prerequisites
+- Node.js (v16+ recommended)
+- npm
+
+### Steps
+
+```bash
+git clone <repository-url>
+cd document-management-frontend
+npm install
+npm run dev
